@@ -7,7 +7,8 @@ router.use(express.json());
 router
   .route("/")
   .get(TodoController.getAllTodos)
-  .post(TodoController.createNewTodo);
+  .post(TodoController.createNewTodo)
+  .delete(TodoController.deleteTodos);
 
 router
   .route("/:id")

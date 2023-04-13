@@ -1,4 +1,5 @@
 import { Todo, validateTodo } from "../models/Todo.js";
+import Joi from "joi";
 
 const sync = async (options = {}) => await Todo.sync(options);
 
@@ -20,6 +21,32 @@ const createNewTodo = async (req, res) => {
     const { title, completed } = req.body;
     const todo = await Todo.create({ title, completed });
     res.json(todo);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+const deleteTodos = async (req, res) => {
+  const schema = Joi.object({
+    ids: Joi.array().required(),
+  })
+    .min(1)
+    .messages({ "object.min": "Empty request" });
+
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  try {
+    const { ids } = req.body;
+    const whereClause = { where: { id: ids } };
+    const todos = await Todo.findAll(whereClause);
+
+    if (todos.length === 0) return res.status(404).send("no todos was found");
+
+    Todo.destroy(whereClause);
+
+    res.send(todos);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
@@ -72,4 +99,12 @@ const updateTodo = async (req, res) => {
   }
 };
 
-export { sync, getAllTodos, createNewTodo, getTodo, deleteTodo, updateTodo };
+export {
+  sync,
+  getAllTodos,
+  createNewTodo,
+  getTodo,
+  deleteTodo,
+  updateTodo,
+  deleteTodos,
+};
