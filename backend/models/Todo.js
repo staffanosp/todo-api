@@ -14,7 +14,7 @@ const Todo = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    completed: {
+    isCompleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
@@ -30,11 +30,11 @@ function validateTodo(todo, options = { method: "post" }) {
 
   const schema = Joi.object({
     title: Joi.string()
-      .min(3)
+      // .min(3)
       .alter({
         post: (schema) => schema.required(),
       }),
-    completed: Joi.boolean(),
+    isCompleted: Joi.boolean(),
   })
     .min(1)
     .messages({ "object.min": "Empty request" });

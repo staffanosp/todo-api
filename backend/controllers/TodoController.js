@@ -14,12 +14,15 @@ const getAllTodos = async (_, res) => {
 };
 
 const createNewTodo = async (req, res) => {
+  console.log(req.body);
   const { error } = validateTodo(req.body);
+  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const { title, completed } = req.body;
-    const todo = await Todo.create({ title, completed });
+    const { title, isCompleted } = req.body;
+    const todo = await Todo.create({ title, isCompleted });
+
     res.json(todo);
   } catch (err) {
     console.log(err);
@@ -40,11 +43,14 @@ const deleteTodos = async (req, res) => {
   try {
     const { ids } = req.body;
     const whereClause = { where: { id: ids } };
-    const todos = await Todo.findAll(whereClause);
+    const todos = await Todo.findAll({
+      ...whereClause,
+      attributes: ["id"],
+    });
 
     if (todos.length === 0) return res.status(404).send("no todos was found");
 
-    Todo.destroy(whereClause);
+    await Todo.destroy(whereClause);
 
     res.send(todos);
   } catch (err) {
