@@ -1,53 +1,22 @@
 import { useState, useEffect } from "react";
 import useSWR from "swr";
+
+import {
+  TODOS_ENDPOINT as cacheKey,
+  getTodos,
+  addTodo,
+  updateTodo,
+  deleteTodo,
+} from "./api/todosApi";
+
+import {
+  addTodoOptions,
+  updateTodoOptions,
+  deleteTodoOptions,
+} from "./api/todosSWROptions";
+
 import "./App.css";
 import TodoItem from "./components/TodoItem";
-
-const ENDPOINT_BASE = "http://localhost:3000/api/todos";
-
-const getTodos = async (url) => {
-  console.log("FETCHER!!!");
-  const res = await fetch(url);
-  const data = await res.json();
-  return data;
-};
-
-const addTodo = async (newTodo) => {
-  const res = await fetch(`${ENDPOINT_BASE}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newTodo),
-  });
-
-  const data = await res.json();
-  return data;
-};
-
-const updateTodo = async (id, body) => {
-  console.log("UPDATE TODO?!");
-  const res = await fetch(`${ENDPOINT_BASE}/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  const data = await res.json();
-  return data;
-};
-
-const deleteTodo = async (id) => {
-  console.log("DELETE TODO?!");
-  const res = await fetch(`${ENDPOINT_BASE}/${id}`, {
-    method: "DELETE",
-  });
-
-  const data = await res.json();
-  return data;
-};
 
 function App() {
   const [todoInput, setTodoInput] = useState("");
@@ -55,10 +24,13 @@ function App() {
 
   const [mutationCounter, setMutationCounter] = useState(0);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
-    `${ENDPOINT_BASE}`,
-    getTodos
-  );
+  const {
+    data: todos,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR(cacheKey, getTodos);
 
   useEffect(() => {
     if (isValidating || mutationCounter > 0) {
@@ -68,30 +40,50 @@ function App() {
     }
   }, [isValidating, mutationCounter]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-
+  const addTodoMutation = async (newTodo) => {
     setMutationCounter((old) => ++old);
 
-    setTodoInput("");
-
-    const newTodo = {
-      title: todoInput,
-    };
-
     try {
-      await mutate(addTodo(newTodo), {
-        optimisticData: [...data, { ...newTodo, isPending: true }],
-        rollbackOnError: false,
-        populateCache: false,
-        revalidate: true,
-      });
-      console.log("MUTATE: SUCCESS");
+      await mutate(addTodo(newTodo), addTodoOptions(newTodo, todos));
     } catch (e) {
-      console.error("MUTATE: ERROR");
+      console.error("Mutation error");
     }
 
     setMutationCounter((old) => --old);
+  };
+
+  const updateTodoMutation = async (id, body) => {
+    setMutationCounter((old) => ++old);
+
+    try {
+      await mutate(updateTodo(id, body), updateTodoOptions(id, body));
+    } catch (e) {
+      console.error("Mutation error");
+    }
+
+    setMutationCounter((old) => --old);
+  };
+
+  const deleteTodoMutation = async (id) => {
+    setMutationCounter((old) => ++old);
+
+    try {
+      await mutate(deleteTodo(id), deleteTodoOptions(id));
+    } catch (e) {
+      console.error("Mutation error");
+    }
+
+    setMutationCounter((old) => --old);
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    setTodoInput("");
+
+    await addTodoMutation({
+      title: todoInput,
+    });
   }
 
   if (error) return "An error has occurred.";
@@ -107,54 +99,14 @@ function App() {
         {isSyncing && <span>SYNCING</span>}
       </form>
 
-      {data.map(({ title, id, isCompleted, isPending }, i) => (
+      {todos.map((todo, i) => (
         <TodoItem
-          key={id || i}
-          id={id}
-          label={title}
-          isCompleted={isCompleted}
-          isPending={isPending}
-          updateTodo={async (id, body) => {
-            setMutationCounter((old) => ++old);
-            try {
-              await mutate(updateTodo(id, body), {
-                optimisticData: (data) => {
-                  const index = data.findIndex((item) => item.id === id);
-                  data[index] = { ...data[index], ...body };
-                  return [...data];
-                },
-                rollbackOnError: true,
-                populateCache: false,
-                revalidate: false,
-              });
-              console.log("MUTATE: SUCCESS");
-            } catch (e) {
-              console.error("MUTATE: ERROR");
-            }
-            setMutationCounter((old) => --old);
-          }}
-          deleteTodo={async (id) => {
-            setMutationCounter((old) => ++old);
-            try {
-              await mutate(deleteTodo(id), {
-                optimisticData: (data) => {
-                  const index = data.findIndex((item) => item.id === id);
-                  data.splice(index, 1);
-                  return [...data];
-                },
-                rollbackOnError: true,
-                populateCache: false,
-                revalidate: false,
-              });
-              console.log("MUTATE: SUCCESS");
-            } catch (e) {
-              console.error("MUTATE: ERROR");
-            }
-            setMutationCounter((old) => --old);
-          }}
+          key={todo.id || i}
+          todo={todo}
+          updateTodo={updateTodoMutation}
+          deleteTodo={deleteTodoMutation}
         />
       ))}
-      {data.map((item) => item.title)}
     </div>
   );
 }
