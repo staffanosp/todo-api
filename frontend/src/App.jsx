@@ -99,14 +99,16 @@ function App() {
         {isSyncing && <span>SYNCING</span>}
       </form>
 
-      {todos.map((todo, i) => (
-        <TodoItem
-          key={todo.id || i}
-          todo={todo}
-          updateTodo={updateTodoMutation}
-          deleteTodo={deleteTodoMutation}
-        />
-      ))}
+      <div className="todos-wrapper">
+        {todos.map((todo, i) => (
+          <TodoItem
+            key={todo.id || i}
+            todo={todo}
+            updateTodo={updateTodoMutation}
+            deleteTodo={deleteTodoMutation}
+          />
+        ))}
+      </div>
     </div>
   );
 }
