@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 app.use(morgan("tiny"));
 app.use(cors());
 // app.use(fakeSlowServer(0));
-app.use(fakeSlowServer(1000));
+app.use(fakeSlowServer(800));
 app.use("/api", apiRouter);
 
 //start
