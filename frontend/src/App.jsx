@@ -5,7 +5,8 @@ import TodoItem from "./components/TodoItem";
 
 const ENDPOINT_BASE = "http://localhost:3000/api/todos";
 
-const fetcher = async (url) => {
+const getTodos = async (url) => {
+  console.log("FETCHER!!!");
   const res = await fetch(url);
   const data = await res.json();
   return data;
@@ -56,7 +57,7 @@ function App() {
 
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     `${ENDPOINT_BASE}`,
-    fetcher
+    getTodos
   );
 
   useEffect(() => {
@@ -123,12 +124,7 @@ function App() {
                   return [...data];
                 },
                 rollbackOnError: true,
-                populateCache: (updatedTodo, data) => {
-                  const index = data.findIndex((item) => item.id === id);
-
-                  data[index] = updatedTodo;
-                  return [...data];
-                },
+                populateCache: false,
                 revalidate: false,
               });
               console.log("MUTATE: SUCCESS");
@@ -147,7 +143,7 @@ function App() {
                   return [...data];
                 },
                 rollbackOnError: true,
-                populateCache: false, //TODO: populate cache!
+                populateCache: false,
                 revalidate: false,
               });
               console.log("MUTATE: SUCCESS");
@@ -158,6 +154,7 @@ function App() {
           }}
         />
       ))}
+      {data.map((item) => item.title)}
     </div>
   );
 }
