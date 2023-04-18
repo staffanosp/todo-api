@@ -2,18 +2,18 @@ import { useState, useEffect } from "react";
 
 import "../styles/TodoItem.css";
 
-function TodoItem({ todo, updateTodo, deleteTodo }) {
+function TodoItem({ todo, animDelayMultiplier, updateTodo, deleteTodo }) {
   const { title, id, isCompleted, isPending } = todo;
 
   const [checkbox, setCheckbox] = useState(isCompleted);
-  const [initAnim, setInitAnim] = useState(true);
+  const [pendingAnim, setPendingAnim] = useState(true);
 
   useEffect(() => {
-    setInitAnim(false);
+    setTimeout(() => setPendingAnim(false), animDelayMultiplier * 50);
   }, []);
 
   const wrapperClassName = ["TodoItem__wrapper"];
-  if (isPending || initAnim) wrapperClassName.push("pending");
+  if (isPending || pendingAnim) wrapperClassName.push("pending");
   if (isCompleted) wrapperClassName.push("completed");
 
   return (
@@ -37,7 +37,7 @@ function TodoItem({ todo, updateTodo, deleteTodo }) {
       <div className="delete__wrapper">
         {!isPending && (
           <button type="button" onClick={() => deleteTodo(id)}>
-            DELETE
+            X
           </button>
         )}
       </div>

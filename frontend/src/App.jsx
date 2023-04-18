@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
 
 import {
@@ -21,6 +21,7 @@ import TodoItem from "./components/TodoItem";
 function App() {
   const [todoInput, setTodoInput] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
+  const todosLength = useRef({ prev: 0, new: 0 });
 
   const [mutationCounter, setMutationCounter] = useState(0);
 
@@ -31,6 +32,13 @@ function App() {
     isValidating,
     mutate,
   } = useSWR(cacheKey, getTodos);
+
+  useEffect(() => {
+    if (todos) {
+      todosLength.current.prev = todosLength.current.new;
+      todosLength.current.new = todos.filter((todo) => !todo.isPending).length;
+    }
+  }, [todos]);
 
   useEffect(() => {
     if (isValidating || mutationCounter > 0) {
@@ -87,28 +95,36 @@ function App() {
   }
 
   if (error) return "An error has occurred.";
-  if (isLoading) return "Loading...";
+  if (isLoading) return <div className="loader"></div>;
 
   return (
     <div className="App">
       <form onSubmit={handleSubmit}>
         <input
+          type="text"
+          placeholder="new todo"
           value={todoInput}
           onChange={(e) => setTodoInput(e.target.value)}
         ></input>
-        {isSyncing && <span>SYNCING</span>}
       </form>
 
       <div className="todos-wrapper">
         {todos.map((todo, i) => (
           <TodoItem
             key={todo.id || i}
+            animDelayMultiplier={i - todosLength.current.prev}
             todo={todo}
             updateTodo={updateTodoMutation}
             deleteTodo={deleteTodoMutation}
           />
         ))}
       </div>
+
+      {isSyncing && (
+        <div className="sync-wrapper">
+          <div className="loader"></div>
+        </div>
+      )}
     </div>
   );
 }

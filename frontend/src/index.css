@@ -50,6 +50,7 @@ h6 {
   font-family: "Inter", sans-serif;
 
   --blackish: #222;
-  --whiteish: #ccc;
+  --whiteish: rgb(204, 204, 204);
+  --whiteish-alpha: rgba(204, 204, 204, 0.5);
   --blue: #001eff;
 }

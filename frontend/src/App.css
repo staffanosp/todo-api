@@ -2,14 +2,56 @@ body {
   padding: 2rem;
   background-color: var(--blackish);
   color: var(--whiteish);
+  font-size: 2rem;
+}
+
+.App {
+  width: 100%;
+  max-width: 30rem;
+}
+
+.App .sync-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.loader {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  border: solid var(--whiteish) 1px;
+  animation: rotate 2s linear infinite;
 }
 
 .todos-wrapper {
+  width: 100%;
+  overflow: hidden;
   margin-top: 2rem;
-  /* background-color: red; */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+input[type="text"] {
   width: 100%;
-  max-width: 30rem;
+  color: var(--whiteish);
+  background: none;
+  border: unset;
+  border-bottom: 1px solid var(--whiteish-alpha);
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="text"]:hover {
+  border-bottom: 1px solid var(--whiteish);
+}
+
+@keyframes rotate {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
 }

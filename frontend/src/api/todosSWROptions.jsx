@@ -12,7 +12,7 @@ const updateTodoOptions = (id, body) => {
     optimisticData: (todos) => {
       const index = todos.findIndex((item) => item.id === id);
       todos[index] = { ...todos[index], ...body };
-      return todos;
+      return [...todos];
     },
     rollbackOnError: true,
     populateCache: false,
