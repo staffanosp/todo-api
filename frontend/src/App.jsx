@@ -21,6 +21,11 @@ import TodoItem from "./components/TodoItem";
 function App() {
   const [todoInput, setTodoInput] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
+
+  const [todosSelection, setTodosSelection] = useState({});
+
+  const todosListElRef = useRef();
+
   const todosLength = useRef({ prev: 0, new: 0 });
 
   const [mutationCounter, setMutationCounter] = useState(0);
@@ -34,10 +39,21 @@ function App() {
   } = useSWR(cacheKey, getTodos);
 
   useEffect(() => {
+    document.addEventListener("click", handleDocumentClick);
+
+    return () => {
+      console.log("CLEANUP?!");
+      removeEventListener("click", handleDocumentClick);
+    };
+  }, []);
+
+  useEffect(() => {
     if (todos) {
       todosLength.current.prev = todosLength.current.new;
       todosLength.current.new = todos.filter((todo) => !todo.isPending).length;
     }
+
+    setTodosSelection({});
   }, [todos]);
 
   useEffect(() => {
@@ -47,6 +63,15 @@ function App() {
       setIsSyncing(false);
     }
   }, [isValidating, mutationCounter]);
+
+  const handleDocumentClick = (e) => {
+    if (
+      e.target.contains(todosListElRef.current) &&
+      e.target !== todosListElRef.current
+    ) {
+      setTodosSelection({});
+    }
+  };
 
   const addTodoMutation = async (newTodo) => {
     setMutationCounter((old) => ++old);
@@ -84,6 +109,70 @@ function App() {
     setMutationCounter((old) => --old);
   };
 
+  const handleTodoListClick = (clickedIndex, modKeys) => {
+    const toggle = (arr, item) => {
+      if (arr.includes(item)) {
+        return arr.filter((oldItem) => oldItem !== item);
+      } else {
+        return [...arr, item];
+      }
+    };
+
+    const arrayRange = (start, stop, step) =>
+      Array.from(
+        { length: (stop - start) / step + 1 },
+        (value, index) => start + index * step
+      );
+
+    const prev = todosSelection.current;
+    console.log({ prev });
+
+    let current, selected, shiftAnchor;
+
+    current = clickedIndex;
+    selected = todosSelection.selected || [];
+
+    if (modKeys.cmd) {
+      selected = toggle(selected, current);
+    } else if (modKeys.shift) {
+      console.log("shift");
+
+      if (todosSelection.shiftAnchor === undefined) {
+        //first "shift click"
+        shiftAnchor = prev;
+      } else {
+        //repeated shift click
+        shiftAnchor = todosSelection.shiftAnchor;
+
+        //remove previous shift click selection
+        const toBeRemoved = arrayRange(
+          shiftAnchor,
+          prev,
+          Math.sign(prev - shiftAnchor)
+        );
+
+        selected = selected.filter((item) => !toBeRemoved.includes(item));
+      }
+
+      const shiftSelection = arrayRange(
+        shiftAnchor,
+        current,
+        Math.sign(current - shiftAnchor)
+      );
+      console.log(shiftSelection);
+
+      selected = [...selected, ...shiftSelection];
+    } else {
+      selected = [current];
+    }
+
+    selected = [...new Set(selected)].sort((a, b) => a - b);
+    const newTodosSelection = { current, selected, shiftAnchor };
+    setTodosSelection(newTodosSelection);
+
+    console.log(newTodosSelection);
+  };
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -108,14 +197,17 @@ function App() {
         ></input>
       </form>
 
-      <div className="todos-wrapper">
+      <div className="todos-wrapper" ref={todosListElRef}>
         {todos.map((todo, i) => (
           <TodoItem
+            listIndex={i}
             key={todo.id || i}
-            animDelayMultiplier={i - todosLength.current.prev}
             todo={todo}
+            isSelected={todosSelection.selected?.includes(i)}
+            animDelayMultiplier={i - todosLength.current.prev}
             updateTodo={updateTodoMutation}
             deleteTodo={deleteTodoMutation}
+            onClick={handleTodoListClick}
           />
         ))}
       </div>

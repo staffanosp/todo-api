@@ -9,7 +9,7 @@
   height: 4rem;
   border-bottom: 1px solid var(--whiteish);
   opacity: 1;
-  transition: all 800ms;
+  transition: opacity 800ms, translate 1200ms ease;
 }
 
 .TodoItem__wrapper.completed {
@@ -25,6 +25,10 @@
 .TodoItem__wrapper.pending {
   opacity: var(--pending-opacity);
   translate: 2rem;
+}
+
+.TodoItem__wrapper.selected {
+  background-color: var(--whiteish-alpha);
 }
 
 .TodoItem__wrapper .checkbox__wrapper {
@@ -43,6 +47,7 @@
 }
 
 .TodoItem__wrapper .title__wrapper {
+  user-select: none;
   width: 100%;
   display: flex;
   justify-content: flex-start;
