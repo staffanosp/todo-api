@@ -60,7 +60,13 @@ function TodoItem({
       </div>
       <div className="delete__wrapper">
         {!isPending && (
-          <button type="button" onClick={() => deleteTodo(id)}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteTodo(id);
+            }}
+          >
             X
           </button>
         )}
