@@ -5,6 +5,7 @@ import {
   TODOS_ENDPOINT as cacheKey,
   getTodos,
   addTodo,
+  deleteTodos,
   updateTodo,
   deleteTodo,
 } from "./api/todosApi";
@@ -13,16 +14,20 @@ import {
   addTodoOptions,
   updateTodoOptions,
   deleteTodoOptions,
+  deleteTodosOptions,
 } from "./api/todosSWROptions";
 
 import "./App.css";
 import TodoItem from "./components/TodoItem";
+import Button from "./components/Button";
 
 function App() {
   const [todoInput, setTodoInput] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
 
   const [todosSelection, setTodosSelection] = useState({});
+  const [isMultiSelection, setIsMultiSelection] = useState(false);
+  const todosIndexToId = useRef();
 
   const todosListElRef = useRef();
 
@@ -42,7 +47,6 @@ function App() {
     document.addEventListener("click", handleDocumentClick);
 
     return () => {
-      console.log("CLEANUP?!");
       removeEventListener("click", handleDocumentClick);
     };
   }, []);
@@ -52,6 +56,11 @@ function App() {
       todosLength.current.prev = todosLength.current.new;
       todosLength.current.new = todos.filter((todo) => !todo.isPending).length;
     }
+
+    //is it better to handle this closer to list view?
+    todosIndexToId.current = Object.fromEntries(
+      todos?.map((todo, i) => [i, todo.id]) ?? []
+    );
 
     setTodosSelection({});
   }, [todos]);
@@ -64,7 +73,12 @@ function App() {
     }
   }, [isValidating, mutationCounter]);
 
+  useEffect(() => {
+    setIsMultiSelection(todosSelection.selected?.length > 1);
+  }, [todosSelection]);
+
   const handleDocumentClick = (e) => {
+    //catch clicks outside list, to unselect
     if (
       e.target.contains(todosListElRef.current) &&
       e.target !== todosListElRef.current
@@ -109,6 +123,18 @@ function App() {
     setMutationCounter((old) => --old);
   };
 
+  const deleteTodosMutation = async (ids) => {
+    setMutationCounter((old) => ++old);
+
+    try {
+      await mutate(deleteTodos(ids), deleteTodosOptions(ids));
+    } catch (e) {
+      console.error("Mutation error");
+    }
+
+    setMutationCounter((old) => --old);
+  };
+
   const handleTodoListClick = (clickedIndex, modKeys) => {
     const toggle = (arr, item) => {
       if (arr.includes(item)) {
@@ -125,7 +151,6 @@ function App() {
       );
 
     const prev = todosSelection.current;
-    console.log({ prev });
 
     let current, selected, shiftAnchor;
 
@@ -135,8 +160,6 @@ function App() {
     if (modKeys.cmd) {
       selected = toggle(selected, current);
     } else if (modKeys.shift) {
-      console.log("shift");
-
       if (todosSelection.shiftAnchor === undefined) {
         //first "shift click"
         shiftAnchor = prev;
@@ -159,7 +182,6 @@ function App() {
         current,
         Math.sign(current - shiftAnchor)
       );
-      console.log(shiftSelection);
 
       selected = [...selected, ...shiftSelection];
     } else {
@@ -169,8 +191,6 @@ function App() {
     selected = [...new Set(selected)].sort((a, b) => a - b);
     const newTodosSelection = { current, selected, shiftAnchor };
     setTodosSelection(newTodosSelection);
-
-    console.log(newTodosSelection);
   };
 
   async function handleSubmit(e) {
@@ -211,7 +231,21 @@ function App() {
           />
         ))}
       </div>
-
+      {isMultiSelection && (
+        <div>
+          <Button
+            onClick={() => {
+              deleteTodosMutation(
+                todosSelection.selected.map(
+                  (idx) => todosIndexToId.current[idx]
+                )
+              );
+            }}
+          >
+            Delete selected
+          </Button>
+        </div>
+      )}
       {isSyncing && (
         <div className="sync-wrapper">
           <div className="loader"></div>

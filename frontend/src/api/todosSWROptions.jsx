@@ -33,4 +33,18 @@ const deleteTodoOptions = (id) => {
   };
 };
 
-export { addTodoOptions, updateTodoOptions, deleteTodoOptions };
+const deleteTodosOptions = (ids) => {
+  return {
+    optimisticData: (todos) => todos.filter((todo) => !ids.includes(todo.id)),
+    rollbackOnError: true,
+    populateCache: false,
+    revalidate: false,
+  };
+};
+
+export {
+  addTodoOptions,
+  updateTodoOptions,
+  deleteTodoOptions,
+  deleteTodosOptions,
+};

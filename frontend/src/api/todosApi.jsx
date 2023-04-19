@@ -41,4 +41,24 @@ const deleteTodo = async (id) => {
   return data;
 };
 
-export { TODOS_ENDPOINT, getTodos, addTodo, updateTodo, deleteTodo };
+const deleteTodos = async (ids) => {
+  const res = await fetch(`${TODOS_ENDPOINT}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ids }),
+  });
+
+  const data = await res.json();
+  return data;
+};
+
+export {
+  TODOS_ENDPOINT,
+  getTodos,
+  addTodo,
+  deleteTodos,
+  updateTodo,
+  deleteTodo,
+};
