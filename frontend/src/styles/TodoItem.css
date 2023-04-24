@@ -14,11 +14,14 @@
 
 .TodoItem__wrapper.completed {
   opacity: var(--completed-opacity);
-  text-decoration: line-through;
+  /* text-decoration: line-through; */
 }
 
-.TodoItem__wrapper:hover.completed {
+.TodoItem__wrapper:hover {
   opacity: 1;
+}
+
+.completed .TodoItem__title {
   text-decoration: line-through;
 }
 
@@ -55,13 +58,17 @@
   padding: 0.5rem;
 }
 
-.TodoItem__wrapper .delete__wrapper {
+.TodoItem__wrapper .buttons__wrapper {
+  /* background-color: red; */
+  display: flex;
+  height: 100%;
   padding: 0.5rem;
+  gap: 0.5rem;
   opacity: 0;
   transition: opacity 200ms ease;
 }
 
-.TodoItem__wrapper:hover .delete__wrapper {
+.TodoItem__wrapper:hover .buttons__wrapper {
   transition: unset;
   opacity: 1;
 }

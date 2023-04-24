@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import "../styles/TodoItem.css";
+import Button from "./Button";
 
 function TodoItem({
   listIndex,
@@ -56,19 +57,21 @@ function TodoItem({
         />
       </div>
       <div className="title__wrapper">
-        <span>{title}</span>
+        <span className="TodoItem__title">{title}</span>
       </div>
-      <div className="delete__wrapper">
+      <div className="buttons__wrapper">
         {!isPending && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteTodo(id);
-            }}
-          >
-            X
-          </button>
+          <>
+            {/* <Button>Edit</Button> */}
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteTodo(id);
+              }}
+            >
+              X
+            </Button>
+          </>
         )}
       </div>
     </div>
