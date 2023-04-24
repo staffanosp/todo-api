@@ -30,7 +30,7 @@ function validateTodo(todo, options = { method: "post" }) {
 
   const schema = Joi.object({
     title: Joi.string()
-      // .min(3)
+      .min(3)
       .alter({
         post: (schema) => schema.required(),
       }),
