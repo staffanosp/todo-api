@@ -14,7 +14,7 @@ const getAllTodos = async (_, res) => {
 };
 
 const createNewTodo = async (req, res) => {
-  console.log(req.body);
+  //input validation
   const { error } = validateTodo(req.body);
   console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
@@ -93,6 +93,7 @@ const updateTodo = async (req, res) => {
     const todo = await Todo.findByPk(id);
     if (!todo) return res.status(404).send("the todo was not found");
 
+    //input validation
     const { error } = validateTodo(req.body, { method: "patch" });
     if (error) return res.status(400).send(error.details[0].message);
 

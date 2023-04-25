@@ -22,6 +22,7 @@ const updateTodoOptions = (id, body) => {
 
 const deleteTodoOptions = (id) => {
   return {
+    //TODO: FIX MUTATION PROBLEMS. todos should not be spliced in place
     optimisticData: (todos) => {
       const index = todos.findIndex((item) => item.id === id);
       todos.splice(index, 1);
