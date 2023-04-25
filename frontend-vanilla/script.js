@@ -1,9 +1,23 @@
 const todoListEl = document.getElementById("todoList");
+const todoListFormEl = document.getElementById("todoListForm");
 
 const TODOS_ENDPOINT = "http://localhost:3000/api/todos";
 
 const getTodos = async (url) => {
   const res = await fetch(url);
+  const data = await res.json();
+  return data;
+};
+
+const addTodo = async (newTodo) => {
+  const res = await fetch(`${TODOS_ENDPOINT}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newTodo),
+  });
+
   const data = await res.json();
   return data;
 };
@@ -31,7 +45,7 @@ const render = () => {
     newDeleteButton.innerHTML = "DELETE";
     newDeleteButton.addEventListener("click", async () => {
       await deleteTodo(todo.id);
-      update();
+      await update();
     });
 
     newTodoItem.append(newDeleteButton);
@@ -51,4 +65,14 @@ const update = async () => {
   setTodos(await getTodos(TODOS_ENDPOINT));
 };
 
-update();
+todoListFormEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const formProps = Object.fromEntries(formData);
+
+  await addTodo({ title: formProps.input });
+
+  await update();
+});
+
+await update();
