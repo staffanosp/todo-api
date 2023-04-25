@@ -1,15 +1,55 @@
-const todoListEl = document.getElementById("todoList");
-const todoListFormEl = document.getElementById("todoListForm");
-
 const TODOS_ENDPOINT = "http://localhost:3000/api/todos";
 
-const getTodos = async (url) => {
-  const res = await fetch(url);
-  const data = await res.json();
-  return data;
+//state and "state setters"
+let todos = [];
+let isLoadingCounter = 0;
+
+const setTodos = (newValue) => {
+  todos = newValue;
+  render();
 };
 
-const addTodo = async (newTodo) => {
+const setIsLoadingCounter = (newValue) => {
+  isLoadingCounter = newValue;
+  render();
+};
+
+//elements
+const todoListEl = document.getElementById("todoList");
+const todoListFormEl = document.getElementById("todoListForm");
+const todoListInputEl = document.getElementById("todoListInput");
+
+//event listeners
+todoListFormEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const formProps = Object.fromEntries(formData);
+
+  todoListInputEl.value = "";
+
+  await mutate(() => addTodo({ title: formProps.input }));
+});
+
+//functions
+async function mutate(mutation) {
+  setIsLoadingCounter(++isLoadingCounter);
+  await mutation();
+  await revalidate();
+  setIsLoadingCounter(--isLoadingCounter);
+}
+
+async function revalidate() {
+  setTodos(await getTodos());
+}
+
+async function getTodos() {
+  const res = await fetch(TODOS_ENDPOINT);
+  const data = await res.json();
+  return data;
+}
+
+async function addTodo(newTodo) {
   const res = await fetch(`${TODOS_ENDPOINT}`, {
     method: "POST",
     headers: {
@@ -20,18 +60,18 @@ const addTodo = async (newTodo) => {
 
   const data = await res.json();
   return data;
-};
+}
 
-const deleteTodo = async (id) => {
+async function deleteTodo(id) {
   const res = await fetch(`${TODOS_ENDPOINT}/${id}`, {
     method: "DELETE",
   });
 
   const data = await res.json();
   return data;
-};
+}
 
-const render = () => {
+function render() {
   todoListEl.innerHTML = "";
 
   todos.forEach((todo) => {
@@ -44,35 +84,26 @@ const render = () => {
     newDeleteButton.type = "button";
     newDeleteButton.innerHTML = "DELETE";
     newDeleteButton.addEventListener("click", async () => {
-      await deleteTodo(todo.id);
-      await update();
+      await mutate(() => deleteTodo(todo.id));
     });
 
     newTodoItem.append(newDeleteButton);
 
     todoListEl.append(newTodoItem);
   });
-};
 
-let todos = [];
+  if (isLoadingCounter) {
+    const isLoadingCounterEl = document.createElement("div");
+    isLoadingCounterEl.innerHTML = "Loading...";
+    todoListEl.append(isLoadingCounterEl);
+  }
+}
 
-const setTodos = (newValue) => {
-  todos = newValue;
-  render();
-};
+async function main() {
+  setIsLoadingCounter(++isLoadingCounter);
+  await revalidate();
+  setIsLoadingCounter(--isLoadingCounter);
+}
 
-const update = async () => {
-  setTodos(await getTodos(TODOS_ENDPOINT));
-};
-
-todoListFormEl.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const formProps = Object.fromEntries(formData);
-
-  await addTodo({ title: formProps.input });
-
-  await update();
-});
-
-await update();
+//entry point
+main();
