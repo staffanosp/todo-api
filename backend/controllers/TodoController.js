@@ -5,7 +5,9 @@ const sync = async (options = {}) => await Todo.sync(options);
 
 const getAllTodos = async (_, res) => {
   try {
-    const todos = await Todo.findAll();
+    const todos = await Todo.findAll({
+      order: [["created_at", "DESC"]],
+    });
     res.send(todos);
   } catch (err) {
     console.log(err);

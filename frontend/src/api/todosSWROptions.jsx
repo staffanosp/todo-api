@@ -1,6 +1,6 @@
 const addTodoOptions = (newTodo, todos) => {
   return {
-    optimisticData: [...todos, { ...newTodo, isPending: true }],
+    optimisticData: [{ ...newTodo, isPending: true }, ...todos],
     rollbackOnError: false,
     populateCache: false,
     revalidate: true,
