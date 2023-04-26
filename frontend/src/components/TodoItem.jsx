@@ -18,7 +18,9 @@ function TodoItem({
   const [pendingAnim, setPendingAnim] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setPendingAnim(false), animDelayMultiplier * 50);
+    requestAnimationFrame(() =>
+      setTimeout(() => setPendingAnim(false), animDelayMultiplier * 50)
+    );
   }, []);
 
   const handleClick = (e) => {

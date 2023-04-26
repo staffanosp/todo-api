@@ -31,8 +31,6 @@ function App() {
 
   const todosListElRef = useRef();
 
-  const todosLength = useRef({ prev: 0, new: 0 });
-
   const [mutationCounter, setMutationCounter] = useState(0);
 
   const {
@@ -52,11 +50,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (todos) {
-      todosLength.current.prev = todosLength.current.new;
-      todosLength.current.new = todos.filter((todo) => !todo.isPending).length;
-    }
-
     //is it better to handle this closer to list view?
     todosIndexToId.current = Object.fromEntries(
       todos?.map((todo, i) => [i, todo.id]) ?? []
@@ -195,7 +188,6 @@ function App() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     setTodoInput("");
 
     await addTodoMutation({
@@ -224,7 +216,7 @@ function App() {
             key={todo.id || i}
             todo={todo}
             isSelected={todosSelection.selected?.includes(i)}
-            animDelayMultiplier={i - todosLength.current.prev}
+            animDelayMultiplier={i}
             updateTodo={updateTodoMutation}
             deleteTodo={deleteTodoMutation}
             onClick={handleTodoListClick}
