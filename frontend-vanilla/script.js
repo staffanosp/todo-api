@@ -72,6 +72,7 @@ async function deleteTodo(id) {
 }
 
 function render() {
+  const inputIsDisabled = isLoadingCounter > 0;
   todoListEl.innerHTML = "";
 
   todos.forEach((todo) => {
@@ -80,17 +81,27 @@ function render() {
     newTodoItem.innerHTML = todo.title;
 
     const newDeleteButton = document.createElement("button");
-
+    newDeleteButton.disabled = inputIsDisabled;
     newDeleteButton.type = "button";
     newDeleteButton.innerHTML = "DELETE";
     newDeleteButton.addEventListener("click", async () => {
       await mutate(() => deleteTodo(todo.id));
     });
 
-    newTodoItem.append(newDeleteButton);
+    const checkBoxInput = document.createElement("input");
+    checkBoxInput.disabled = inputIsDisabled;
+    checkBoxInput.type = "checkbox";
+    checkBoxInput.checked = todo.isCompleted;
+    checkBoxInput.addEventListener("change", async function (e) {
+      await mutate(() => updateTodo(todo.id, { isCompleted: this.checked }));
+    });
 
+    newTodoItem.prepend(checkBoxInput);
+    newTodoItem.append(newDeleteButton);
     todoListEl.append(newTodoItem);
   });
+
+  todoListInputEl.disabled = inputIsDisabled;
 
   if (isLoadingCounter) {
     const isLoadingCounterEl = document.createElement("div");
