@@ -6,14 +6,14 @@ router.use(express.json());
 
 router
   .route("/")
-  .get(TodoController.getAllTodos) //brief mandatory
-  .post(TodoController.createNewTodo) //brief mandatory
+  .get(TodoController.getAllTodos)
+  .post(TodoController.createNewTodo)
   .delete(TodoController.deleteTodos);
 
 router
   .route("/:id")
-  .get(TodoController.getTodo) //brief mandatory
-  .delete(TodoController.deleteTodo) //brief mandatory
-  .patch(TodoController.updateTodo); //brief mandatory
+  .get(TodoController.getTodo)
+  .delete(TodoController.deleteTodo)
+  .patch(TodoController.updateTodo);
 
 export default router;
