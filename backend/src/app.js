@@ -3,22 +3,26 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import { sequelize } from "./utils/database.js";
-import apiRouter from "./routes/api/api.js";
+import getApiRouter from "./routes/api/api.js";
 import { sync as TodoModelSync } from "./controllers/TodoController.js";
 import { fakeSlowServer } from "./utils/utils.js";
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(morgan("tiny"));
-app.use(cors());
-// app.use(fakeSlowServer(0));
-app.use(fakeSlowServer(800));
-app.use("/api", apiRouter);
-
-//start
-
 const main = async () => {
+  const app = express();
+  const port = process.env.PORT || 3000;
+
+  app.get("/", (req, res) => {
+    res.status(404).send("nothing here");
+  });
+
+  app.use(morgan("tiny"));
+  app.use(cors());
+  // app.use(fakeSlowServer(0));
+  app.use(fakeSlowServer(800));
+  app.use("/api", getApiRouter());
+
+  //start
+
   app.listen(port, () => {
     console.log(`listening on port ${port}`);
   });
