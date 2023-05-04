@@ -27,3 +27,4 @@ dist-ssr
 #misc
 .env
 temp
+*.http
