@@ -24,8 +24,13 @@ body {
   animation: rotate 2s linear infinite;
 }
 
-button {
+.button {
   font-size: 1rem;
+  border: none;
+}
+
+input[type="submit"] {
+  display: none;
 }
 
 @keyframes rotate {

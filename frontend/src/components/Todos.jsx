@@ -211,7 +211,7 @@ function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
           placeholder="new todo"
           value={todoInput}
           onChange={(e) => setTodoInput(e.target.value)}
-        ></input>
+        />
       </form>
 
       <div className="todos-wrapper" ref={todosListElRef}>

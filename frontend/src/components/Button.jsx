@@ -1,5 +1,3 @@
-import "../styles/Button.css";
-
 function Button({ children, onClick, disabled }) {
   return (
     <button

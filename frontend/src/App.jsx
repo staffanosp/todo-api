@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Todos from "./components/Todos";
 
 function App() {
+  const [statusMsg, setStatusMsg] = useState(""); // undefined | pending | true | false
   const [isLoggedIn, setIsLoggedIn] = useState(undefined); // undefined | pending | true | false
 
   const [isTodosValidating, setIsTodosValidating] = useState(false);
@@ -50,14 +51,20 @@ function App() {
     }
   }, [mutationCounter, isTodosValidating, isTokenValidating]);
 
-  async function handleLogIn() {
+  async function handleLogIn(username, password) {
     setMutationCounter((old) => ++old);
+    const data = await userLogin(username, password);
+    setMutationCounter((old) => --old);
 
-    const { token } = await userLogin();
+    const { token } = data;
+
+    if (!token) {
+      setStatusMsg("couldn't login");
+      return;
+    }
 
     localStorage.setItem("token", token);
-
-    setMutationCounter((old) => --old);
+    setStatusMsg("");
     setIsLoggedIn(true);
   }
 
@@ -70,7 +77,12 @@ function App() {
 
   switch (isLoggedIn) {
     case false:
-      content = <Login isDisabled={isSyncing} handleLogin={handleLogIn} />;
+      content = (
+        <>
+          <Login isDisabled={isSyncing} handleLogin={handleLogIn} />
+          <p>{statusMsg}</p>
+        </>
+      );
       break;
     case true:
       content = (

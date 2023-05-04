@@ -25,6 +25,4 @@ const fetchWithToken = async (...theArgs) => {
   return await fetch(...theArgs);
 };
 
-const dummyUser = { userName: "testUser", userId: "12345" };
-
-export { fakeSlowServer, dummyUser, fetchWithToken };
+export { fakeSlowServer, fetchWithToken };
