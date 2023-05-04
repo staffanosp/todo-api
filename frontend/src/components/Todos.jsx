@@ -21,17 +21,14 @@ import "../styles/Todos.css";
 import TodoItem from "./TodoItem";
 import Button from "./Button";
 
-function Todos({ handleLogOut }) {
+function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
   const [todoInput, setTodoInput] = useState("");
-  const [isSyncing, setIsSyncing] = useState(false);
 
   const [todosSelection, setTodosSelection] = useState({});
   const [isMultiSelection, setIsMultiSelection] = useState(false);
   const todosIndexToId = useRef();
 
   const todosListElRef = useRef();
-
-  const [mutationCounter, setMutationCounter] = useState(0);
 
   const {
     data: todos,
@@ -59,12 +56,8 @@ function Todos({ handleLogOut }) {
   }, [todos]);
 
   useEffect(() => {
-    if (isValidating || mutationCounter > 0) {
-      setIsSyncing(true);
-    } else {
-      setIsSyncing(false);
-    }
-  }, [isValidating, mutationCounter]);
+    setIsTodosValidating(isValidating);
+  }, [isValidating]);
 
   useEffect(() => {
     setIsMultiSelection(todosSelection.selected?.length > 1);
@@ -196,7 +189,7 @@ function Todos({ handleLogOut }) {
   }
 
   if (error) return "An error has occurred.";
-  if (isLoading) return <div className="loader"></div>;
+  if (isLoading) return;
 
   return (
     <div className="Todos">
@@ -239,11 +232,6 @@ function Todos({ handleLogOut }) {
         </div>
       )}
       <Button onClick={handleLogOut}>Log out</Button>
-      {isSyncing && (
-        <div className="sync-wrapper">
-          <div className="loader"></div>
-        </div>
-      )}
     </div>
   );
 }

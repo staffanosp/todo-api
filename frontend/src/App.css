@@ -10,6 +10,29 @@ body {
   max-width: 30rem;
 }
 
+.App .sync-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.loader {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  border: solid var(--whiteish) 1px;
+  animation: rotate 2s linear infinite;
+}
+
 button {
   font-size: 1rem;
+}
+
+@keyframes rotate {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
 }
