@@ -36,7 +36,9 @@ function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
     isLoading,
     isValidating,
     mutate,
-  } = useSWR(cacheKey, getTodos);
+  } = useSWR(cacheKey, getTodos, {
+    revalidateOnMount: true,
+  });
 
   useEffect(() => {
     document.addEventListener("click", handleDocumentClick);
@@ -62,6 +64,16 @@ function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
   useEffect(() => {
     setIsMultiSelection(todosSelection.selected?.length > 1);
   }, [todosSelection]);
+
+  const handleLogOutLocal = () => {
+    //clear cache
+    mutate(
+      undefined, // update cache data to `undefined`
+      { revalidate: false } // do not revalidate
+    );
+
+    handleLogOut();
+  };
 
   const handleDocumentClick = (e) => {
     //catch clicks outside list, to unselect
@@ -203,7 +215,7 @@ function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
       </form>
 
       <div className="todos-wrapper" ref={todosListElRef}>
-        {todos.map((todo, i) => (
+        {todos?.map((todo, i) => (
           <TodoItem
             listIndex={i}
             key={todo.id || i}
@@ -231,7 +243,7 @@ function Todos({ handleLogOut, setMutationCounter, setIsTodosValidating }) {
           </Button>
         </div>
       )}
-      <Button onClick={handleLogOut}>Log out</Button>
+      <Button onClick={handleLogOutLocal}>Log out</Button>
     </div>
   );
 }
