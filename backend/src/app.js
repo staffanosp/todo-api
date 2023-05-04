@@ -19,6 +19,7 @@ const main = async () => {
   app.use(cors());
   // app.use(fakeSlowServer(0));
   app.use(fakeSlowServer(800));
+  app.use(express.json());
   app.use("/api", getApiRouter());
 
   //start

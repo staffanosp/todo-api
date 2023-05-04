@@ -1,13 +1,15 @@
-const TODOS_ENDPOINT = "http://localhost:3000/api/todos";
+import { fetchWithToken } from "../../../backend/src/utils/utils";
 
-const getTodos = async (url) => {
-  const res = await fetch(url);
+const BASE_ENDPOINT = "http://localhost:3000/api/todos";
+
+const getTodos = async () => {
+  const res = await fetchWithToken(BASE_ENDPOINT);
   const data = await res.json();
   return data;
 };
 
 const addTodo = async (newTodo) => {
-  const res = await fetch(`${TODOS_ENDPOINT}`, {
+  const res = await fetchWithToken(BASE_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +22,7 @@ const addTodo = async (newTodo) => {
 };
 
 const updateTodo = async (id, body) => {
-  const res = await fetch(`${TODOS_ENDPOINT}/${id}`, {
+  const res = await fetchWithToken(`${BASE_ENDPOINT}/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +35,7 @@ const updateTodo = async (id, body) => {
 };
 
 const deleteTodo = async (id) => {
-  const res = await fetch(`${TODOS_ENDPOINT}/${id}`, {
+  const res = await fetchWithToken(`${BASE_ENDPOINT}/${id}`, {
     method: "DELETE",
   });
 
@@ -42,7 +44,7 @@ const deleteTodo = async (id) => {
 };
 
 const deleteTodos = async (ids) => {
-  const res = await fetch(`${TODOS_ENDPOINT}`, {
+  const res = await fetchWithToken(BASE_ENDPOINT, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -55,7 +57,7 @@ const deleteTodos = async (ids) => {
 };
 
 export {
-  TODOS_ENDPOINT,
+  BASE_ENDPOINT,
   getTodos,
   addTodo,
   deleteTodos,

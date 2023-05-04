@@ -1,9 +1,10 @@
 import express from "express";
 import * as TodoController from "../../../controllers/TodoController.js";
+import verifyToken from "../../../utils/verifyToken.js";
 
 const getRouter = () => {
   const router = express.Router();
-  router.use(express.json());
+  router.use(verifyToken);
 
   router
     .route("/")

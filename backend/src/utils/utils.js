@@ -14,4 +14,17 @@ const fakeSlowServer = (delayMs) => {
   };
 };
 
-export { fakeSlowServer };
+const fetchWithToken = async (...theArgs) => {
+  const token = localStorage.getItem("token");
+
+  theArgs[1] = {
+    ...theArgs[1],
+    headers: { ...theArgs[1]?.headers, Authorization: `Bearer ${token}` },
+  };
+
+  return await fetch(...theArgs);
+};
+
+const dummyUser = { userName: "testUser", userId: "12345" };
+
+export { fakeSlowServer, dummyUser, fetchWithToken };

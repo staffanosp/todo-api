@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
 
 import {
-  TODOS_ENDPOINT as cacheKey,
+  BASE_ENDPOINT as cacheKey,
   getTodos,
   addTodo,
   deleteTodos,
