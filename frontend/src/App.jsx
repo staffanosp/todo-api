@@ -18,9 +18,8 @@ function App() {
 
     const checkLoggedInStatus = async () => {
       setIsLoggedIn("pending");
-      const token = localStorage.getItem("token");
 
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         setIsLoggedIn(false);
         return;
       }
@@ -28,7 +27,7 @@ function App() {
       //verify the token
       setIsTokenValidating(true);
       try {
-        await verifyToken(token);
+        await verifyToken();
         setIsLoggedIn(true);
       } catch (e) {
         localStorage.clear();
