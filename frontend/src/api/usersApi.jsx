@@ -26,12 +26,8 @@ const userLogin = async (username, password) => {
   // }
 };
 
-const verifyToken = async (token) => {
-  const res = await fetch(`${BASE_ENDPOINT}/verifyToken`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+const verifyToken = async () => {
+  const res = await fetchWithToken(`${BASE_ENDPOINT}/verifyToken`);
 
   const data = await res.json();
   return data;
