@@ -30,7 +30,7 @@ const deleteTodoOptions = (id) => {
     },
     rollbackOnError: true,
     populateCache: false,
-    revalidate: false,
+    revalidate: true,
   };
 };
 
