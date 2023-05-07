@@ -18,7 +18,7 @@ const main = async () => {
   app.use(morgan("tiny"));
   app.use(cors());
   // app.use(fakeSlowServer(0));
-  app.use(fakeSlowServer(800));
+  app.use(fakeSlowServer(200));
   app.use(express.json());
   app.use("/api", getApiRouter());
 
