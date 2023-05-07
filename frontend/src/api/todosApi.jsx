@@ -1,4 +1,4 @@
-import { fetchWithToken } from "../../../backend/src/utils/utils";
+import { fetchWithToken } from "../utils/utils";
 
 const BASE_ENDPOINT = "http://localhost:3000/api/todos";
 
